@@ -1,4 +1,5 @@
 set nocompatible
+set nomodeline
 filetype indent plugin on
 autocmd FileType conf set foldmethod=indent
 autocmd FileType perl set equalprg=perltidy
@@ -22,6 +23,7 @@ if has("foldlevel")
 let perl_fold = 1
 let perl_fold_blocks = 1
 let javaScript_fold=1
+let g:kite_tab_complete=1
 set foldlevel=1
 endif
 let perl_include_pod = 1
@@ -38,11 +40,30 @@ set showcmd " display incomplete commands
 set incsearch " do incremental searching
 set showmatch
 set colorcolumn=80
+
+" Settings for Syntastic
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+
 " Switch syntax highlighting on, when the terminal has colors
 " Also switch on highlighting the last used search pattern.
 if &t_Co > 2 || has("gui_running")
-syntax on
-set hlsearch
+  syntax on
+  set hlsearch
+
+  highlight ExtraWhitespace ctermbg=red guibg=red
+  "autocmd Syntax * syn match ExtraWhitespace /\s\+$\| \+\ze\t/
+  match ExtraWhitespace /\s\+$/
+  autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
+  autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
+  autocmd InsertLeave * match ExtraWhitespace /\s\+$/
+  autocmd BufWinLeave * call clearmatches()
 endif
 " http://vim.wikia.com/wiki/Switching_case_of_characters
 "function! TwiddleCase(str)
@@ -115,7 +136,7 @@ Bundle 'tpope/vim-git'
 Bundle 'tpope/vim-fugitive'
 Bundle 'tpope/vim-surround'
 Bundle 'tpope/vim-repeat'
-Bundle 'tsaleh/vim-matchit'
+Bundle 'adelarsq/vim-matchit'
 "Bundle 'scrooloose/nerdtree'
 Bundle 'scrooloose/nerdcommenter'
 Bundle 'kien/ctrlp.vim'
@@ -136,4 +157,10 @@ endif
 syntax enable
 set background=dark
 colorscheme solarized
+if exists("&undodir")
+    set undofile          "Persistent undo! Pure money.
+    let &undodir=&directory
+    set undolevels=500
+    set undoreload=500
+endif
 
